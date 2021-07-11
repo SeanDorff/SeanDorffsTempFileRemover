@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace SeanDorffsTempFileRemover
 {
     internal class DirectoryCleaner
     {
-        private static OsTools osTools = new OsTools();
-        private static OsPlatforms osPlatform;
-        private static List<string> directoriesToClean = new List<string>();
+        private readonly OsTools osTools = new OsTools();
+        private readonly OsPlatforms osPlatform;
+        private readonly List<string> directoriesToClean = new List<string>();
 
         public DirectoryCleaner()
         {
@@ -20,7 +21,7 @@ namespace SeanDorffsTempFileRemover
             switch (osPlatform)
             {
                 case OsPlatforms.Windows:
-                    directoriesToClean = getDirectoriesWindows();
+                    directoriesToClean = GetDirectoriesWindows();
                     break;
                 default:
                     ConsoleWriter.WriteLine("\tPlatform not supported.");
@@ -32,17 +33,62 @@ namespace SeanDorffsTempFileRemover
             foreach (string directory in directoriesToClean)
                 ConsoleWriter.WriteLine("\t" + directory);
             ConsoleWriter.EmptyLine();
-            ConsoleWriter.WriteLine("Go ahead and do it yourself.");
+
+            ConsoleWriter.WriteLine("Cleaning directories...");
+            foreach (string directory in directoriesToClean)
+            {
+                ConsoleWriter.WriteLine("\t" + directory + " ...");
+                DeleteDirectoryContents(directory);
+            }
+
+            ConsoleWriter.EmptyLine();
             ConsoleWriter.WriteLine("Quitting application.");
         }
 
-        private List<string> getDirectoriesWindows()
+        private List<string> GetDirectoriesWindows()
         {
-            List<string> directoriesToClean = new List<string>();
-            directoriesToClean.Add(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\Prefetch");
-            directoriesToClean.Add(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\Temp");
-            directoriesToClean.Add(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp");
+            List<string> directoriesToClean = new List<string>
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\Prefetch",
+                Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\Temp",
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp"
+            };
             return directoriesToClean;
+        }
+
+        private void DeleteDirectoryContents(string directory)
+        {
+            List<string> subDirectories = new List<string>(Directory.GetDirectories(directory));
+            foreach (string subDirectory in subDirectories)
+            {
+                DeleteDirectoryContents(subDirectory);
+                ConsoleWriter.WriteLine("\t\tDirectory: " + subDirectory);
+                try
+                {
+                    Directory.Delete(subDirectory);
+                }
+                catch (IOException e)
+                {
+                    ConsoleWriter.WriteLine("\t\t\t" + e.Message);
+                }
+            }
+            List<string> files = new List<string>(Directory.GetFiles(directory));
+            foreach (string file in files)
+            {
+                ConsoleWriter.WriteLine("\t\tFile:      " + file);
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    ConsoleWriter.WriteLine("\t\t\t" + e.Message);
+                }
+                catch (IOException e)
+                {
+                    ConsoleWriter.WriteLine("\t\t\t" + e.Message);
+                }
+            }
         }
     }
 }

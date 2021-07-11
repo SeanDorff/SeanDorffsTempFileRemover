@@ -15,7 +15,7 @@ namespace SeanDorffsTempFileRemover
         {
             text = text.Replace("\t", "   ");
             if (withTimeStamp)
-                Console.Write(getTimeStamp() + "   " + text);
+                Console.Write(GetTimeStamp() + "   " + text);
             else
                 Console.Write("   " + text);
         }
@@ -25,7 +25,7 @@ namespace SeanDorffsTempFileRemover
             WriteLine("", withTimeStamp);
         }
 
-        private static string getTimeStamp()
+        private static string GetTimeStamp()
         {
             return DateTime.Now.ToString("HH:mm:ss.fff");
 

@@ -5,7 +5,7 @@ namespace SeanDorffsTempFileRemover
 {
     internal class OsTools
     {
-        private OsPlatforms osPlatform;
+        private readonly OsPlatforms osPlatform;
 
         internal OsTools()
         {
