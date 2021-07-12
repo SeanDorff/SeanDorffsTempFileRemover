@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace SeanDorffsTempFileRemover
@@ -28,7 +29,6 @@ namespace SeanDorffsTempFileRemover
         private static string GetTimeStamp()
         {
             return DateTime.Now.ToString("HH:mm:ss.fff");
-
         }
     }
 }

@@ -29,6 +29,7 @@ namespace SeanDorffsTempFileRemover
                 try
                 {
                     Directory.Delete(subDirectory);
+                    ConsoleWriter.WriteLine("\t\t\t...deleted");
                 }
                 catch (IOException e)
                 {
@@ -43,6 +44,7 @@ namespace SeanDorffsTempFileRemover
                 try
                 {
                     File.Delete(file);
+                    ConsoleWriter.WriteLine("\t\t\t...deleted");
                 }
                 catch (UnauthorizedAccessException e)
                 {
