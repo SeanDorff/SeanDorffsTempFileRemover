@@ -1,59 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace SeanDorffsTempFileRemover
 {
     internal class DirectoryCleaner
     {
-        private readonly OsTools osTools = new OsTools();
-        private readonly OsPlatforms osPlatform;
-        private readonly List<string> directoriesToClean = new List<string>();
-
-        public DirectoryCleaner()
+        internal DirectoryCleaner(List<string> directories)
         {
-            ConsoleWriter.WriteLine("Detecting operating system platform...");
-            osPlatform = osTools.GetOSPlatform();
-            ConsoleWriter.WriteLine("\t" + osPlatform);
-
-            ConsoleWriter.WriteLine("Detecting directories to clean...");
-            switch (osPlatform)
-            {
-                case OsPlatforms.Windows:
-                    directoriesToClean = GetDirectoriesWindows();
-                    break;
-                default:
-                    ConsoleWriter.WriteLine("\tPlatform not supported.");
-                    break;
-            }
-
-            ConsoleWriter.EmptyLine();
-            ConsoleWriter.WriteLine(directoriesToClean.Count + " directories to clean:");
-            foreach (string directory in directoriesToClean)
-                ConsoleWriter.WriteLine("\t" + directory);
-            ConsoleWriter.EmptyLine();
-
-            ConsoleWriter.WriteLine("Cleaning directories...");
-            foreach (string directory in directoriesToClean)
+            Task[] taskArray = new Task[directories.Count];
+            int taskNo = 0;
+            foreach (string directory in directories)
             {
                 ConsoleWriter.WriteLine("\t" + directory + " ...");
-                DeleteDirectoryContents(directory);
+                taskArray[taskNo++] = Task.Factory.StartNew(() => { DeleteDirectoryContents(directory); });
             }
-
-            ConsoleWriter.EmptyLine();
-            ConsoleWriter.WriteLine("Quitting application.");
-        }
-
-        private List<string> GetDirectoriesWindows()
-        {
-            List<string> directoriesToClean = new List<string>
-            {
-                Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\Prefetch",
-                Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\Temp",
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp"
-            };
-            return directoriesToClean;
+            Task.WaitAll(taskArray);
         }
 
         private void DeleteDirectoryContents(string directory)
@@ -72,6 +35,7 @@ namespace SeanDorffsTempFileRemover
                     ConsoleWriter.WriteLine("\t\t\t" + e.Message);
                 }
             }
+
             List<string> files = new List<string>(Directory.GetFiles(directory));
             foreach (string file in files)
             {

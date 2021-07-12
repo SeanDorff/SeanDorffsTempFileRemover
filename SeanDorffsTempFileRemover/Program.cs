@@ -7,7 +7,7 @@ namespace SeanDorffsTempFileRemover
     {
         static void Main(string[] args)
         {
-            new DirectoryCleaner();
+            new TempFileRemover();
             ConsoleWriter.WriteLine("Press any key to close this window.");
             Console.ReadKey();
         }
